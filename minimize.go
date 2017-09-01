@@ -5,18 +5,46 @@ import (
 	"os"
 	"syscall"
 	"unsafe"
+
+	"github.com/urfave/cli"
 )
 
 func main() {
+	app := cli.NewApp()
+	app.Name = "minimize"
+	app.Usage = "minimize/restore parent window"
+	app.Version = "0.2.0"
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{Name: "restore, r", Usage: "restore"},
+	}
+	app.Action = runShow
+	app.Run(os.Args)
+}
+
+func runShow(c *cli.Context) error {
+	restore := c.GlobalBool("restore")
+	return show(restore)
+}
+
+func show(restore bool) error {
 	ppid := os.Getppid()
 
-	wins, _ := listAllWindows()
+	wins, err := listAllWindows()
+	if err != nil {
+		return err
+	}
+
 	for _, w := range wins {
 		if w.PID == ppid {
-			showWindow.Call(uintptr(w.Handle), SW_MINIMIZE)
+			if restore {
+				showWindow.Call(uintptr(w.Handle), SW_RESTORE)
+			} else {
+				showWindow.Call(uintptr(w.Handle), SW_MINIMIZE)
+			}
 			break
 		}
 	}
+	return nil
 }
 
 type (
@@ -39,6 +67,7 @@ var (
 
 const (
 	SW_MINIMIZE = 6
+	SW_RESTORE  = 9
 )
 
 func listAllWindows() (wins []*Window, err error) {
