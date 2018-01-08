@@ -6,27 +6,14 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/urfave/cli"
+	"bitbucket.org/shu/gli"
 )
 
-func main() {
-	app := cli.NewApp()
-	app.Name = "minimize"
-	app.Usage = "minimize/restore parent window"
-	app.Version = "0.2.0"
-	app.Flags = []cli.Flag{
-		cli.BoolFlag{Name: "restore, r", Usage: "restore"},
-	}
-	app.Action = runShow
-	app.Run(os.Args)
+type Arg struct {
+	Restore bool `cli:"restore, r"  help:"restore from minimized/maximized"`
 }
 
-func runShow(c *cli.Context) error {
-	restore := c.GlobalBool("restore")
-	return show(restore)
-}
-
-func show(restore bool) error {
+func (g Arg) Run() error {
 	ppid := os.Getppid()
 
 	wins, err := listAllWindows()
@@ -36,7 +23,7 @@ func show(restore bool) error {
 
 	for _, w := range wins {
 		if w.PID == ppid {
-			if restore {
+			if g.Restore {
 				showWindow.Call(uintptr(w.Handle), SW_RESTORE)
 			} else {
 				showWindow.Call(uintptr(w.Handle), SW_MINIMIZE)
@@ -45,6 +32,19 @@ func show(restore bool) error {
 		}
 	}
 	return nil
+}
+
+func main() {
+	//defer rog.DoneDebugging()()
+
+	app := gli.New(&Arg{})
+	app.Name = "minimize"
+	app.Desc = "minimize/restore parent window"
+	app.Version = "0.3.0"
+	app.Usage = `minimize [-r]`
+	app.Copyright = "(C) 2017 Shuhei Kubota"
+
+	app.Run(os.Args)
 }
 
 type (
