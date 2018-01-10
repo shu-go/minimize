@@ -9,11 +9,11 @@ import (
 	"bitbucket.org/shu/gli"
 )
 
-type Arg struct {
+type globalCmd struct {
 	Restore bool `cli:"restore, r"  help:"restore from minimized/maximized"`
 }
 
-func (g Arg) Run() error {
+func (g globalCmd) Run() error {
 	ppid := os.Getppid()
 
 	wins, err := listAllWindows()
@@ -37,14 +37,14 @@ func (g Arg) Run() error {
 func main() {
 	//defer rog.DoneDebugging()()
 
-	app := gli.New(&Arg{})
+	app := gli.New(&globalCmd{})
 	app.Name = "minimize"
 	app.Desc = "minimize/restore parent window"
 	app.Version = "0.3.0"
 	app.Usage = `minimize [-r]`
 	app.Copyright = "(C) 2017 Shuhei Kubota"
 
-	app.Run(os.Args)
+	app.Run(os.globalCmds)
 }
 
 type (
