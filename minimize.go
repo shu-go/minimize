@@ -6,7 +6,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"bitbucket.org/shu/gli"
+	"bitbucket.org/shu_go/gli"
 )
 
 type globalCmd struct {
@@ -44,7 +44,7 @@ func main() {
 	app.Usage = `minimize [-r]`
 	app.Copyright = "(C) 2017 Shuhei Kubota"
 
-	app.Run(os.globalCmds)
+	app.Run(os.Args)
 }
 
 type (
