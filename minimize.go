@@ -37,7 +37,7 @@ func (g globalCmd) Run() error {
 func main() {
 	//defer rog.DoneDebugging()()
 
-	app := gli.New(&globalCmd{})
+	app := gli.NewWith(&globalCmd{})
 	app.Name = "minimize"
 	app.Desc = "minimize/restore parent window"
 	app.Version = "0.3.0"
