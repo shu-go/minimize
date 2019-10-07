@@ -4,10 +4,20 @@ import (
 	"fmt"
 	"os"
 	"syscall"
+	"time"
 	"unsafe"
 
 	"github.com/shu-go/gli"
 )
+
+// Version is app version
+var Version string
+
+func init() {
+	if Version == "" {
+		Version = "dev-" + time.Now().Format("20060102")
+	}
+}
 
 type globalCmd struct {
 	Restore bool `cli:"restore, r"  help:"restore from minimized/maximized"`
@@ -40,7 +50,7 @@ func main() {
 	app := gli.NewWith(&globalCmd{})
 	app.Name = "minimize"
 	app.Desc = "minimize/restore parent window"
-	app.Version = "0.3.0"
+	app.Version = Version
 	app.Usage = `minimize [-r]`
 	app.Copyright = "(C) 2017 Shuhei Kubota"
 
